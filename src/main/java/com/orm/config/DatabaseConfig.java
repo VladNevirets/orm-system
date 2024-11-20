@@ -17,10 +17,10 @@ import java.util.Properties;
  **/
 
 public class DatabaseConfig {
-    private String url;
-    private String username;
-    private String password;
-    private String driver;
+    private final String url;
+    private final String username;
+    private final String password;
+    private final String driver;
 
     public DatabaseConfig() {
         Properties properties = new Properties();
