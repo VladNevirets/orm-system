@@ -1,12 +1,20 @@
 package com.orm.config;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+
+
+/**
+ * To use DatabaseConfig, you must add the appropriate settings to the app.properties file:
+ * orm.datasource.url
+ * orm.datasource.username
+ * orm.datasource.password
+ * orm.datasource.driver
+ **/
 
 public class DatabaseConfig {
     private String url;
@@ -22,10 +30,10 @@ public class DatabaseConfig {
             }
             properties.load(input);
 
-            this.url = properties.getProperty("datasource.url");
-            this.username = properties.getProperty("datasource.username");
-            this.password = properties.getProperty("datasource.password");
-            this.driver = properties.getProperty("datasource.driver");
+            this.url = properties.getProperty("orm.datasource.url");
+            this.username = properties.getProperty("orm.datasource.username");
+            this.password = properties.getProperty("orm.datasource.password");
+            this.driver = properties.getProperty("orm.datasource.driver");
         } catch (IOException e) {
             throw new RuntimeException("Failed to load database configuration", e);
         }
