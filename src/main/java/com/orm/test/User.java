@@ -6,7 +6,7 @@ import com.orm.annotation.Entity;
 import com.orm.annotation.Id;
 import com.orm.annotation.Table;
 
-@Entity
+//@Entity
 @Table(name="users")
 public class User {
     @Id

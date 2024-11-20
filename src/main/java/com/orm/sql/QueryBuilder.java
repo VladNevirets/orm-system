@@ -1,8 +1,11 @@
 package com.orm.sql;
 
 import com.orm.annotation.Column;
+import com.orm.annotation.Entity;
 import com.orm.annotation.Id;
 import com.orm.annotation.Table;
+import com.orm.exception.AnnotationNotFoundException;
+import com.orm.exception.EntityNotMappedEcxeption;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -12,13 +15,17 @@ public class QueryBuilder {
     public static String insertQuery(Object entity) {
         Class<?> clazz = entity.getClass();
         StringBuilder query = new StringBuilder("INSERT INTO ");
-
-        if (clazz.isAnnotationPresent(Table.class)) {
+        Entity entityAnnotation = clazz.getAnnotation(Entity.class);
+        if (entityAnnotation == null) {
+            throw new EntityNotMappedEcxeption("Class " + clazz.getSimpleName() + " is not an entity.");
+        }
+        try {
             Table table = clazz.getAnnotation(Table.class);
             query.append(table.name()).append(" (");
-        } else {
-            throw new RuntimeException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
+        } catch (NullPointerException e) {
+            throw new AnnotationNotFoundException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
         }
+
 
         Field[] fields = clazz.getDeclaredFields();
         List<String> columns = new ArrayList<>();
@@ -54,21 +61,26 @@ public class QueryBuilder {
     public static String selectQuery(Class<?> clazz, Object primaryKey) {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
 
-        if (clazz.isAnnotationPresent(Table.class)) {
+        Entity entityAnnotation = clazz.getAnnotation(Entity.class);
+        if (entityAnnotation == null) {
+            throw new EntityNotMappedEcxeption("Class " + clazz.getSimpleName() + " is not an entity.");
+        }
+        try {
             Table table = clazz.getAnnotation(Table.class);
             query.append(table.name());
-        } else {
-            throw new RuntimeException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
+        } catch (NullPointerException e) {
+            throw new AnnotationNotFoundException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
         }
+
 
         query.append(" WHERE ");
         for (Field field : clazz.getDeclaredFields()) {
             if (field.isAnnotationPresent(Id.class)) {
                 if (field.isAnnotationPresent(Column.class)) {
                     Column column = field.getAnnotation(Column.class);
-                    if(field.getType()==String.class){
+                    if (field.getType() == String.class) {
                         query.append(column.name()).append(" = '").append(primaryKey).append("'");
-                    }else{
+                    } else {
                         query.append(column.name()).append(" = ").append(primaryKey);
                     }
                 }
@@ -79,16 +91,23 @@ public class QueryBuilder {
 
         return query.toString();
     }
+
     public static String updateQuery(Object entity) {
         Class<?> clazz = entity.getClass();
         StringBuilder query = new StringBuilder("UPDATE ");
-        if (clazz.isAnnotationPresent(Table.class)) {
+
+        Entity entityAnnotation = clazz.getAnnotation(Entity.class);
+        if (entityAnnotation == null) {
+            throw new EntityNotMappedEcxeption("Class " + clazz.getSimpleName() + " is not an entity.");
+        }
+        try {
             Table table = clazz.getAnnotation(Table.class);
             query.append(table.name());
             query.append(" SET ");
-        } else {
-            throw new RuntimeException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
+        } catch (NullPointerException e) {
+            throw new AnnotationNotFoundException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
         }
+
 
         Field[] fields = clazz.getDeclaredFields();
 
@@ -102,14 +121,14 @@ public class QueryBuilder {
                     if (field.isAnnotationPresent(Id.class)) {
                         whereClause = column.name() + " = " + field.get(entity) + "  ";
 
-                    }else{
+                    } else {
                         Object value = field.get(entity);
                         if (value != null) {
-                            if(value instanceof Number){
-                                setClauses.add(column.name()+" = "+value.toString());
-                            }else{
+                            if (value instanceof Number) {
+                                setClauses.add(column.name() + " = " + value.toString());
+                            } else {
 
-                                setClauses.add(column.name()+" = '"+value.toString()+"'");
+                                setClauses.add(column.name() + " = '" + value.toString() + "'");
                             }
                         }
                     }
@@ -118,10 +137,10 @@ public class QueryBuilder {
                 }
 
             }
-        }catch (IllegalAccessException e){
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        if(setClauses.isEmpty()){
+        if (setClauses.isEmpty()) {
             throw new RuntimeException("No set query");
         }
 
@@ -134,12 +153,15 @@ public class QueryBuilder {
     public static String deleteQuery(Object entity) {
         Class<?> clazz = entity.getClass();
         StringBuilder query = new StringBuilder("DELETE FROM ");
-
-        if (clazz.isAnnotationPresent(Table.class)) {
+        Entity entityAnnotation = clazz.getAnnotation(Entity.class);
+        if (entityAnnotation == null) {
+            throw new EntityNotMappedEcxeption("Class " + clazz.getSimpleName() + " is not an entity.");
+        }
+        try {
             Table table = clazz.getAnnotation(Table.class);
             query.append(table.name());
-        } else {
-            throw new RuntimeException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
+        } catch (NullPointerException e) {
+            throw new AnnotationNotFoundException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
         }
 
         query.append(" WHERE ");
@@ -149,9 +171,9 @@ public class QueryBuilder {
                 try {
                     if (field.isAnnotationPresent(Column.class)) {
                         Column column = field.getAnnotation(Column.class);
-                        if(Number.class.isAssignableFrom(field.getType())){
+                        if (Number.class.isAssignableFrom(field.getType())) {
                             query.append(column.name()).append(" = ").append(field.get(entity));
-                        }else{
+                        } else {
 
                             query.append(column.name()).append(" = '").append(field.get(entity)).append("'");
                         }
