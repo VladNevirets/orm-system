@@ -1,8 +1,8 @@
-package com.orm.EntityManager;
+package com.orm.entityManager;
 
 public interface EntityManager<T> {
     void create(T entity);
-    T find(Class<T> entityClass, Object primaryKey);
+    T read(Class<?> entityClass, Object primaryKey);
     void update(T entity);
     void delete(T entity);
 }
