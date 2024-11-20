@@ -23,7 +23,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void create(Object entity) {
         String query = QueryBuilder.insertQuery(entity);
-        System.out.println("Generated SQL Query: " + query);
+        System.out.println(query);
         try(Statement statment = conn.createStatement()) {
             statment.executeUpdate(query);
         }catch(SQLException e) {
@@ -34,7 +34,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public Object read(Class entityClass, Object primaryKey) {
         String query = QueryBuilder.selectQuery(entityClass, primaryKey);
-        System.out.println("Generated SQL Query: " + query);
+        System.out.println( query);
 
         try(Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery(query)){
@@ -44,7 +44,8 @@ public class EntityManagerImpl implements EntityManager {
                     field.setAccessible(true);
                     if (field.isAnnotationPresent(Column.class)) {
                         Column column = field.getAnnotation(Column.class);
-                        field.set(entity, resultSet.getObject(column.name()));
+                        Object value = resultSet.getObject(column.name());
+                        field.set(entity, convertValue(value, field.getType()));
                     }
                 }
                 return entity;
@@ -68,7 +69,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void update(Object entity) {
         String query = QueryBuilder.updateQuery(entity);
-        System.out.println("Generated SQL Query: " + query);
+        System.out.println(query);
         try(Statement statment = conn.createStatement()) {
             statment.executeUpdate(query);
         }catch(SQLException e) {
@@ -81,12 +82,35 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void delete(Object entity) {
         String query = QueryBuilder.deleteQuery(entity);
-        System.out.println("Generated SQL Query: " + query);
+        System.out.println(query);
         try(Statement statement = conn.createStatement()){
             statement.executeUpdate(query);
         }catch(SQLException e) {
             e.printStackTrace();
         }
 
+    }
+    private Object convertValue(Object value, Class<?> targetType) {
+        if (value == null) {
+            return null;
+        }
+
+        if (targetType.isAssignableFrom(value.getClass())) {
+            return value;
+        }
+
+        if (targetType == Integer.class || targetType == int.class) {
+            return ((Number) value).intValue();
+        } else if (targetType == Long.class || targetType == long.class) {
+            return ((Number) value).longValue();
+        } else if (targetType == Double.class || targetType == double.class) {
+            return ((Number) value).doubleValue();
+        } else if (targetType == Float.class || targetType == float.class) {
+            return ((Number) value).floatValue();
+        } else if (targetType == String.class) {
+            return value.toString();
+        }
+
+        throw new IllegalArgumentException("Cannot convert value of type " + value.getClass() + " to " + targetType);
     }
 }

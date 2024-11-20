@@ -11,8 +11,10 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         DatabaseConfig config = new DatabaseConfig();
         EntityManager<User> entityManager = new EntityManagerImpl(config.getConnection());
-        User user = new User(Long.valueOf(6),"Dan");
-        entityManager.create(user);
 
+        User user = new User();
+        user.setUserName("test");
+        User zal = entityManager.read(User.class, 1);
+        System.out.println(zal);
     }
 }

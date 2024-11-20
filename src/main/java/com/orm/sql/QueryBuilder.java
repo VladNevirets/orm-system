@@ -16,23 +16,24 @@ public class QueryBuilder {
         Class<?> clazz = entity.getClass();
         StringBuilder query = new StringBuilder("INSERT INTO ");
         Entity entityAnnotation = clazz.getAnnotation(Entity.class);
+
         if (entityAnnotation == null) {
-            throw new EntityNotMappedEcxeption("Class " + clazz.getSimpleName() + " is not an entity.");
+            throw new EntityNotMappedEcxeption("Insert: Class " + clazz.getSimpleName() + " is not an entity.");
         }
-        try {
-            Table table = clazz.getAnnotation(Table.class);
-            query.append(table.name()).append(" (");
-        } catch (NullPointerException e) {
+
+        Table table = clazz.getAnnotation(Table.class);
+        if (table == null) {
             throw new AnnotationNotFoundException("Class " + clazz.getSimpleName() + " is not annotated with @Table.");
         }
 
+        query.append(table.name()).append(" (");
 
         Field[] fields = clazz.getDeclaredFields();
         List<String> columns = new ArrayList<>();
         List<String> values = new ArrayList<>();
 
         for (Field field : fields) {
-            if (field.isAnnotationPresent(Column.class)) {
+            if (field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class)) { // Пропустити поле @Id
                 Column column = field.getAnnotation(Column.class);
                 columns.add(column.name());
 
@@ -58,12 +59,13 @@ public class QueryBuilder {
         return query.toString();
     }
 
+
     public static String selectQuery(Class<?> clazz, Object primaryKey) {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
 
         Entity entityAnnotation = clazz.getAnnotation(Entity.class);
         if (entityAnnotation == null) {
-            throw new EntityNotMappedEcxeption("Class " + clazz.getSimpleName() + " is not an entity.");
+            throw new EntityNotMappedEcxeption("Select:Class " + clazz.getSimpleName() + " is not an entity.");
         }
         try {
             Table table = clazz.getAnnotation(Table.class);
@@ -98,7 +100,7 @@ public class QueryBuilder {
 
         Entity entityAnnotation = clazz.getAnnotation(Entity.class);
         if (entityAnnotation == null) {
-            throw new EntityNotMappedEcxeption("Class " + clazz.getSimpleName() + " is not an entity.");
+            throw new EntityNotMappedEcxeption("Update:Class " + clazz.getSimpleName() + " is not an entity.");
         }
         try {
             Table table = clazz.getAnnotation(Table.class);
@@ -155,7 +157,7 @@ public class QueryBuilder {
         StringBuilder query = new StringBuilder("DELETE FROM ");
         Entity entityAnnotation = clazz.getAnnotation(Entity.class);
         if (entityAnnotation == null) {
-            throw new EntityNotMappedEcxeption("Class " + clazz.getSimpleName() + " is not an entity.");
+            throw new EntityNotMappedEcxeption("Delete:Class " + clazz.getSimpleName() + " is not an entity.");
         }
         try {
             Table table = clazz.getAnnotation(Table.class);
@@ -188,4 +190,6 @@ public class QueryBuilder {
 
         return query.toString();
     }
+
+
 }

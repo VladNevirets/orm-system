@@ -6,8 +6,8 @@ import com.orm.annotation.Entity;
 import com.orm.annotation.Id;
 import com.orm.annotation.Table;
 
-//@Entity
-@Table(name="users")
+@Entity
+@Table(name="testing")
 public class User {
     @Id
     @Column(name="user_id")
