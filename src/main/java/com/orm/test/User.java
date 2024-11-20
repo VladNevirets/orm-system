@@ -20,10 +20,6 @@ public class User {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getUserName() {
         return userName;
     }
@@ -42,9 +38,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "User { \n" +
                 "id=" + id +
-                ", userName='" + userName + '\'' +
-                '}';
+                ",\nuserName='" + userName + '\'' +
+                "\n}";
     }
 }

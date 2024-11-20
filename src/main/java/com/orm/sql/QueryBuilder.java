@@ -94,7 +94,7 @@ public class QueryBuilder {
         return query.toString();
     }
 
-    public static String updateQuery(Object entity) {
+    public static String updateQuery(Object entity,Object primaryKey) {
         Class<?> clazz = entity.getClass();
         StringBuilder query = new StringBuilder("UPDATE ");
 
@@ -121,7 +121,7 @@ public class QueryBuilder {
                 if (field.isAnnotationPresent(Column.class)) {
                     Column column = field.getAnnotation(Column.class);
                     if (field.isAnnotationPresent(Id.class)) {
-                        whereClause = column.name() + " = " + field.get(entity) + "  ";
+                        whereClause = column.name() + " = " + primaryKey + "  ";
 
                     } else {
                         Object value = field.get(entity);

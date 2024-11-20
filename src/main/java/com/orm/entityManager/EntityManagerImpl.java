@@ -69,8 +69,8 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void update(Object entity) {
-        String query = QueryBuilder.updateQuery(entity);
+    public void update(Object entity,Object primaryKey) {
+        String query = QueryBuilder.updateQuery(entity,primaryKey);
         System.out.println(query);
         try(Statement statment = conn.createStatement()) {
             statment.executeUpdate(query);
