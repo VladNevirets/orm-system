@@ -9,11 +9,11 @@ import java.util.Properties;
 
 
 /**
- * To use DatabaseConfig, you must add the appropriate settings to the app.properties file:
- * orm.datasource.url
- * orm.datasource.username
- * orm.datasource.password
- * orm.datasource.driver
+ * To use ConfigurationManager, you must add the appropriate settings to the application.properties file:
+ * mapflow.datasource.url
+ * mapflow.datasource.username
+ * mapflow.datasource.password
+ * mapflow.datasource.driver
  **/
 
 public class ConfigurationManager {
@@ -24,9 +24,10 @@ public class ConfigurationManager {
 
     public ConfigurationManager() {
         Properties properties = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("app.properties")) {
+        //Отримання конфігурації з application.properties
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             if (input == null) {
-                throw new RuntimeException("File 'app.properties' not found in resources!");
+                throw new RuntimeException("File 'application.properties' not found in resources!");
             }
             properties.load(input);
 

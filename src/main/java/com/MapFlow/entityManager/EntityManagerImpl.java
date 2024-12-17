@@ -14,7 +14,7 @@ import java.sql.Statement;
 
 import static com.MapFlow.Convertor.convertValue;
 
-public class EntityManagerImpl implements EntityManager {
+public class EntityManagerImpl<T> implements EntityManager<T> {
     Connection conn;
 
     public EntityManagerImpl() {
@@ -26,11 +26,11 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void create(Object entity) {
+
         Class<?> clazz = entity.getClass();
         if(!clazz.isAnnotationPresent(Entity.class)) {
             throw new EntityNotMappedEcxeption("Insert: Class " + clazz.getSimpleName() + " is not an entity.");
         }
-
         String query = QueryBuilder.insertQuery(entity);
         System.out.println(query);
         try(Statement statment = conn.createStatement()) {
@@ -44,12 +44,10 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public Object read(Class entityClass, Object primaryKey) {
         String query = QueryBuilder.selectQuery(entityClass, primaryKey);
-        System.out.println( query);
         if(!entityClass.isAnnotationPresent(Entity.class)) {
             throw new EntityNotMappedEcxeption("Select:Class " + entityClass.getSimpleName() + " is not an entity.");
         }
-
-
+        System.out.println( query);
         try(Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery(query)){
             if(resultSet.next()) {
@@ -81,13 +79,15 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void update(Object entity,Object primaryKey) {
-        String query = QueryBuilder.updateQuery(entity,primaryKey);
-        System.out.println(query);
-        Class<?> clazz = entity.getClass();
+    public void update(Object updatedEntity,Object primaryKey) {
+        String query = QueryBuilder.updateQuery(updatedEntity,primaryKey);
+        //Отримання данних класу
+        Class<?> clazz = updatedEntity.getClass();
+        //Перевірка на наявність анотації @Entity
         if(!clazz.isAnnotationPresent(Entity.class)) {
-            throw new EntityNotMappedEcxeption("Update: Class " + clazz.getSimpleName() + " is not an entity.");
+            throw new EntityNotMappedEcxeption("Update: Class " + clazz.getSimpleName() + " is not an Entity.");
         }
+        System.out.println(query);
         try(Statement statment = conn.createStatement()) {
             statment.executeUpdate(query);
         }catch(SQLException e) {
@@ -98,13 +98,16 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void delete(Object entity,Object primaryKey) {
+    public void delete(Class<?> entity,Object primaryKey) {
         String query = QueryBuilder.deleteQuery(entity,primaryKey);
-        System.out.println(query);
-        Class<?> clazz = entity.getClass();
+        //Отримання данних класу
+        Class<?> clazz = entity;
+        //Перевірка на наявність анотації @Entity
         if(!clazz.isAnnotationPresent(Entity.class)) {
             throw new EntityNotMappedEcxeption("Delete: Class " + clazz.getSimpleName() + " is not an entity.");
         }
+        System.out.println(query);
+        //Виконання запиту deleteQuery
         try(Statement statement = conn.createStatement()){
             statement.executeUpdate(query);
         }catch(SQLException e) {

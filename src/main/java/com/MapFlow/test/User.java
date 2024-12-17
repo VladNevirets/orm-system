@@ -7,7 +7,7 @@ import com.MapFlow.annotation.Id;
 import com.MapFlow.annotation.Table;
 
 
-@Entity
+//@Entity
 @Table(name="users")
 public class User {
     @Id
@@ -16,6 +16,16 @@ public class User {
 
     @Column(name="user_name")
     private String userName;
+    @Column(name="email")
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public Long getId() {
         return id;
@@ -47,10 +57,11 @@ public class User {
 
     @Override
     public String toString() {
-        return "User { \n" +
+        return "User{" +
                 "id=" + id +
-                ",\nuserName='" + userName + '\'' +
-                "\n}";
+                ", userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }
 
