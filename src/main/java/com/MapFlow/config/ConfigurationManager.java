@@ -40,6 +40,13 @@ public class ConfigurationManager {
         }
     }
 
+    public ConfigurationManager(String url, String username, String password, String driver) {
+        this.url = url;
+        this.username = username;
+        this.password = password;
+        this.driver = driver;
+    }
+
     public Connection getConnection() throws SQLException {
         try {
             Class.forName(driver);
